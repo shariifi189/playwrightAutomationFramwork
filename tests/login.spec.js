@@ -1,45 +1,41 @@
 
- import { test, expect } from '@playwright/test';
+import { test, expect } from '@playwright/test';
 
-test('login feature ', async ({ page }) => {
-  await page.goto('https://www.saucedemo.com/');
- 
-  await page.locator('[data-test="username"]').click();
-  await page.locator('[data-test="username"]').fill('error_user');
-  await page.locator('[data-test="username"]').press('Tab');
-  await page.locator('[data-test="password"]').fill('secret_sauce');
-  await page.locator('[data-test="login-button"]').click();
-  await page.getByRole('button', { name: 'Open Menu' }).click();
-  await page.locator('[data-test="logout-sidebar-link"]').click();
+test.describe('SauceDemo Login', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('https://www.saucedemo.com/');
+  });
 
-});
+  test('should login with valid credentials', async ({ page }) => {
+    await page.fill('[data-test="username"]', 'standard_user');
+    await page.fill('[data-test="password"]', 'secret_sauce');
+    await page.click('[data-test="login-button"]');
 
-test('add to cart ', async ({ page }) => {
-  await page.goto('https://www.saucedemo.com/');
- 
-  await page.locator('[data-test="username"]').click();
-  await page.locator('[data-test="username"]').fill('error_user');
-  await page.locator('[data-test="username"]').press('Tab');
-  await page.locator('[data-test="password"]').fill('secret_sauce');
-  await page.locator('[data-test="login-button"]').click();
- 
+    await expect(page).toHaveURL(/.*inventory.html/);
+    await expect(page.locator('.inventory_list')).toBeVisible();
+  });
 
-});
+  test('should show error for invalid credentials', async ({ page }) => {
+    await page.fill('[data-test="username"]', 'invalid_user');
+    await page.fill('[data-test="password"]', 'wrong_password');
+    await page.click('[data-test="login-button"]');
 
+    const error = page.locator('[data-test="error"]');
+    await expect(error).toBeVisible();
+    await expect(error).toContainText('Epic sadface');
+  });
 
-test('remove from cart', async ({ page }) => {
-  await page.goto('https://www.saucedemo.com/');
- 
+  test('should logout successfully after login', async ({ page }) => {
+    await page.fill('[data-test="username"]', 'standard_user');
+    await page.fill('[data-test="password"]', 'secret_sauce');
+    await page.click('[data-test="login-button"]');
 
- 
-  await page.locator('[data-test="username"]').click();
-  await page.waitForTimeout(5000);
-  await page.locator('[data-test="username"]').fill('error_user');
-  await page.locator('[data-test="username"]').press('Tab');
-  await page.locator('[data-test="password"]').fill('secret_sauce');
-  await page.locator('[data-test="login-button"]').click();
-  await page.getByRole('button', { name: 'Open Menu' }).click();
-  await page.locator('[data-test="logout-sidebar-link"]').click();
+    await expect(page).toHaveURL(/.*inventory.html/);
+    await page.getByRole('button', { name: 'Open Menu' }).click();
+    await page.click('[data-test="logout-sidebar-link"]');
 
+    await expect(page).toHaveURL(/.*saucedemo\.com\/?$/);
+    await expect(page.locator('[data-test="login-button"]')).toBeVisible();
+  });
 });
 

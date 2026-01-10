@@ -1,5 +1,5 @@
 // @ts-check
-import { defineConfig, devices } from '@playwright/test';
+import { defineConfig } from '@playwright/test';
 
 /**
  * Read environment variables from file.
@@ -19,8 +19,8 @@ export default defineConfig({
   /* Fail the build on CI if you accidentally left test.only in the source code. */
   forbidOnly: !!process.env.CI,
   /* Retry on CI only */
-  // retries: process.env.CI ? 2 : 0,
-  retries: 1,
+   retries: process.env.CI ? 1 : 0,
+
 
 
 
@@ -31,14 +31,8 @@ export default defineConfig({
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
 
-    video: 'on',
+    video: 'off',
 
-    launchOptions: {
-      headless: false,
-      args: ['--start-maximized'],   // Forces Chrome window to maximize
-      slowMo: 2000,
-
-    },
 
 
     /* Base URL to use in actions like `await page.goto('')`. */
@@ -56,9 +50,9 @@ export default defineConfig({
         // ...devices['Desktop Chrome'],
        viewport: null,
       launchOptions: {
-        headless: false,
-        args: ['--start-maximized'],
-        slowMo: 2000,
+        headless: true,
+      //  args: ['--start-maximized'],
+      //  slowMo: 2000,
       },
 
 
